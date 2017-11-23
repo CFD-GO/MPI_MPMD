@@ -52,6 +52,11 @@ public:
 
    inline ~MPMDHelper() {
    };
+
+   MPMDIntercomm& operator[](const std::string& key) {
+      return intercomm[key];
+   };
+
    
    inline void Init(const MPI_Comm& world_, const std::string& name_, std::vector<int> excl = std::vector<int>()) {
       int mylen,maxlen;
