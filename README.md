@@ -2,5 +2,18 @@
 
 # Multiple Program Multiple Data programming with MPI
 
-Hepler for doing programing with MPMD MPI.
+This is a simple C++ class to help to easily make programs for MPMD running.
+It is contained in a single `.hpp` file for ease of use.
 
+## Usage
+
+The class can be used as a global static, or just as a local variable in
+main. Either way, you need to only initialize it after you initialize MPI:
+
+```c++
+   MPMDHelper MPMD;
+
+   MPI_Init(&argc, &argv);
+
+   MPMD.Init(MPI_COMM_WORLD, "my program");
+```
