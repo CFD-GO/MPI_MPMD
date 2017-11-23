@@ -151,7 +151,7 @@ public:
       
    }
 
-   inline void MPI_Exchange(const void * out, int out_count, void * in, int in_count, MPI_Datatype datatype, MPI_Comm intercomm, MPI_Comm comm) {
+   inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI_Datatype datatype, MPI_Comm intercomm, MPI_Comm comm) {
       MPI_Request request;
       MPI_Status status;
       int rank;
