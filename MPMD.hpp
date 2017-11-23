@@ -187,7 +187,7 @@ public:
       intercomm.insert(make_pair(inter.name, inter));
    }
 
-   inline void Spawn( const char *command, char *argv[], int maxprocs, MPI_Info info, bool world_ = false) {
+   inline void Spawn( char *command, char *argv[], int maxprocs, MPI_Info info, bool world_ = false) {
       MPI_Comm comm, inter;
       std::vector<int> err(maxprocs);
       int root;
