@@ -113,9 +113,9 @@ public:
       MPI_Comm_group(local,&local_group);
       if (excl.size() > 0) {
          MPI_Group_excl(local_group,excl.size(),&excl[0],&work_group);
-         MPI_Comm_create(local,work_group,&work);
          MPI_Group_rank(work_group, &work_rank);
          MPI_Group_size(work_group, &work_size);
+         MPI_Comm_create(local,work_group,&work);
          in_work = (work_rank != MPI_UNDEFINED);
       } else {
          work_group=local_group;
@@ -171,7 +171,13 @@ public:
       MPI_Comm_remote_size(inter.local, &inter.local_size);
       inter.in_world = world_;
       MPI_Comm_create(inter.local, work_group, &inter.work);
-      if (in_work) MPI_Comm_remote_size(inter.work, &inter.work_size);
+      if (in_work) {
+         if (inter.work != MPI_COMM_NULL) {
+            MPI_Comm_remote_size(inter.work, &inter.work_size);
+         } else {
+            inter.work_size = 0;
+         }
+      }
       
       int other_name_size;
       int my_name_size = name.size() + 1;
