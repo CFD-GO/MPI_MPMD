@@ -1,24 +1,30 @@
-all: master slave bystander
+all: master slave with_workers
 
-test : master_single_test slave_single_test bystander_single_test master_two_test slave_two_test bystander_two_test master_slave_one_two_test
-
-%_single_test : %
-	./$<
-
-%_two_test : %
-	mpirun -np 2 ./$<
-
-master_slave_one_two_test : master slave
+test : all
+	./master
+	./slave
+	./with_workers
+	mpirun -np 2 ./master
+	mpirun -np 2 ./slave
+	mpirun -np 2 ./with_workers
+	./master 1 ./slave
+	./master 2 ./slave
+	./master 1 ./with_workers
+	./master 2 ./with_workers
+	mpirun -np 1 ./master : -np 1 ./slave
 	mpirun -np 1 ./master : -np 2 ./slave
+	mpirun -np 2 ./master : -np 1 ./slave
+	mpirun -np 2 ./master : -np 2 ./slave
+	mpirun -np 1 ./master : -np 1 ./with_workers
+	mpirun -np 1 ./master : -np 2 ./with_workers
+	mpirun -np 2 ./master : -np 1 ./with_workers
+	mpirun -np 2 ./master : -np 2 ./with_workers
+	
+
 
 master.o : master.cpp ../MPMD.hpp
-
-slave : master
-	ln -s $< $@
-
-bystander : master
-	ln -s $< $@
-	
+slave.o : slave.cpp ../MPMD.hpp
+with_workers.o : with_workers.cpp ../MPMD.hpp
 
 % : %.o
 	mpic++ -o $@ $(CXXFLAGS) $^
