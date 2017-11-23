@@ -52,7 +52,7 @@ public:
    inline ~MPMDHelper() {
    };
    
-   inline void Init(const MPI_Comm& world_, const std::string& name_, std::vector<int>& excl = std::vector<int>()) {
+   inline void Init(const MPI_Comm& world_, const std::string& name_, std::vector<int> excl = std::vector<int>()) {
       int mylen,maxlen;
       
       world = world_;
