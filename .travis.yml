@@ -1,0 +1,18 @@
+language: c
+
+addons:
+  apt:
+    packages:
+      - openmpi-bin
+      - libopenmpi-dev
+      - lcov
+      - time
+
+script:
+    - export CXXFLAGS="-fprofile-arcs -ftest-coverage -Wno-write-strings"
+    - cd example
+    - make
+    - timeout 60s make test
+
+after_success: 
+    - bash <(curl -s https://codecov.io/bash)

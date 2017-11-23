@@ -1,5 +1,13 @@
 all: master slave bystander
 
+test : master_single_test slave_single_test bystander_single_test master_two_test slave_two_test bystander_two_test
+
+%_single_test : %
+	./$<
+
+%_two_test : %
+	mpirun -np 2 ./$<
+
 master.o : master.cpp ../MPMD.hpp
 
 slave : master
