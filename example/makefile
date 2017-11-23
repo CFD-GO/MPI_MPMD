@@ -11,6 +11,10 @@ test : all
 	./master 2 ./slave
 	./master 1 ./with_workers
 	./master 2 ./with_workers
+	mpirun -np 2 ./master 1 ./slave
+	mpirun -np 2 ./master 2 ./slave
+	mpirun -np 2 ./master 1 ./with_workers
+	mpirun -np 2 ./master 2 ./with_workers
 	mpirun -np 1 ./master : -np 1 ./slave
 	mpirun -np 1 ./master : -np 2 ./slave
 	mpirun -np 2 ./master : -np 1 ./slave
@@ -19,7 +23,11 @@ test : all
 	mpirun -np 1 ./master : -np 2 ./with_workers
 	mpirun -np 2 ./master : -np 1 ./with_workers
 	mpirun -np 2 ./master : -np 2 ./with_workers
-	
+	mpirun -np 2 ./master : -np 2 ./slave : -np 2 ./with_workers
+	mpirun -np 2 ./with_workers : -np 1 ./master 1 ./slave	
+	mpirun -np 2 ./with_workers : -np 1 ./master 2 ./slave	
+	mpirun -np 2 ./with_workers : -np 2 ./master 1 ./slave	
+	mpirun -np 2 ./with_workers : -np 2 ./master 2 ./slave	
 
 
 master.o : master.cpp ../MPMD.hpp

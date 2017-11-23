@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <mpi.h>
+#include <assert.h>
 
 struct MPMDIntercomm {
    MPI_Comm local;
@@ -100,10 +101,7 @@ public:
          }
          colors++;
       }
-      if (colors > world_size) {
-         fprintf(stderr, "MPMD: more colors then ranks. This doesn't make sens. Fatal error.\n");
-         exit(-1);
-      }
+      assert(colors <= world_size);
       delete[] my_name;
       delete[] other_name;
       MPI_Comm_split(world, color, rank, &local);
@@ -219,7 +217,7 @@ public:
       iden += name;
       iden += ":";
       if (world_) {
-         sprintf(iden_c, " world:%d/%d", world_rank, world_size); iden += iden_c;
+         sprintf(iden_c, " world:%d/%d", world_rank, world_size); iden += iden_c; // LCOV_EXCL_LINE
       }
       sprintf(iden_c, " local:%d/%d", local_rank, local_size); iden += iden_c;
       if (in_work) {
