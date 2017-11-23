@@ -10,9 +10,8 @@ addons:
 
 script:
     - export CXXFLAGS="-fprofile-arcs -ftest-coverage -Wno-write-strings"
-    - cd example
-    - make
-    - timeout 60s make test
+    - make -C example
+    - timeout 60s make -C example test
 
 after_success: 
     - bash <(curl -s https://codecov.io/bash)
