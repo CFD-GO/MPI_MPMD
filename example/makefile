@@ -28,7 +28,11 @@ test : all
 	mpirun -np 2 ./with_workers : -np 1 ./master 2 ./slave	
 	mpirun -np 2 ./with_workers : -np 2 ./master 1 ./slave	
 	mpirun -np 2 ./with_workers : -np 2 ./master 2 ./slave	
-
+	./worker_spawn
+	./worker_spawn 1 ./slave
+	mpirun -np 2 ./worker_spawn 1 ./slave
+	mpirun -np 2 ./worker_spawn 2 ./slave
+	
 
 master.o : master.cpp ../MPMD.hpp
 slave.o : slave.cpp ../MPMD.hpp
