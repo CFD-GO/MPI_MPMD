@@ -168,55 +168,68 @@ public:
       MPI_Bcast(in, in_count, datatype, 0, comm);
    }
 
-   inline void ConnectIntercomm(MPI_Comm local_inter, bool world_) {
-      intercomm_t inter;
-      inter.local = local_inter;
-      MPI_Comm_remote_size(inter.local, &inter.local_size);
-      inter.in_world = world_;
-      int my_trivial_group = (local == work);
-      int other_trivial_group;
-      MPI_Exchange(&my_trivial_group, 1, &other_trivial_group, 1, MPI_INT, inter.local, local);
-      if (my_trivial_group && other_trivial_group) {
-         inter.work = inter.local;
-      } else {
-         MPI_Comm_create(inter.local, work_group, &inter.work);
-      }
-      if (in_work) {
-         if (inter.work != MPI_COMM_NULL) {
-            MPI_Comm_remote_size(inter.work, &inter.work_size);
-         } else {
-            inter.work_size = 0;
-         }
-      }
+   inline void ConnectIntercomm(MPI_Comm inter, bool world_=true, bool work_=false) {
+      intercomm_t ret;
+      ret.in_world = world_;
+      MPI_Comm my_comm = local;
+      if (work_) my_comm = work;
+      int my_work = work_ && (local != work);
+      int other_work;
+      MPI_Exchange(&my_work, 1, &other_work, 1, MPI_INT, inter, my_comm);
+      int no_local = (my_work || other_work);
       
-      int other_name_size;
-      int my_name_size = name.size() + 1;
-      MPI_Exchange(&my_name_size, 1, &other_name_size, 1, MPI_INT, inter.local, local);
       {
+         int other_name_size;
+         int my_name_size = name.size() + 1;
+         MPI_Exchange(&my_name_size, 1, &other_name_size, 1, MPI_INT, inter, my_comm);
          char* my_name = char_vec_from_string(name, my_name_size);
          char* other_name = char_vec_from_string("", other_name_size);
-         MPI_Exchange(my_name, my_name_size, other_name, other_name_size, MPI_CHAR, inter.local, local);
-         inter.name = other_name;
+         MPI_Exchange(my_name, my_name_size, other_name, other_name_size, MPI_CHAR, inter, my_comm);
+         ret.name = other_name;
          delete[] my_name;
          delete[] other_name;
       }
-      intercomm.insert(make_pair(inter.name, inter));
+      
+      if (no_local) {
+         ret.local = MPI_COMM_NULL;
+         ret.local_size = 0;
+      } else {         
+         ret.local = inter;
+         MPI_Comm_remote_size(ret.local, &ret.local_size);
+      }
+      
+      int my_trivial_group = (my_comm == work);
+      int other_trivial_group;
+      MPI_Exchange(&my_trivial_group, 1, &other_trivial_group, 1, MPI_INT, inter, my_comm);
+      if (my_trivial_group && other_trivial_group) {
+         ret.work = inter;
+      } else {
+         MPI_Comm_create(ret.local, work_group, &ret.work);
+      }
+
+      if (ret.work != MPI_COMM_NULL) {
+         MPI_Comm_remote_size(ret.work, &ret.work_size);
+      } else {
+         ret.work_size = 0;
+      }
+      
+      intercomm.insert(make_pair(ret.name, ret));
    }
 
-   inline void Spawn( char *command, char *argv[], int maxprocs, MPI_Info info, bool world_ = false) {
+   inline void Spawn( char *command, char *argv[], int maxprocs, MPI_Info info, bool work_ = false) {
       MPI_Comm comm, inter;
       std::vector<int> err(maxprocs);
       int root;
-      if (world_) {
-         comm = world;
+      if (work_) {
+         comm = work;
          root = 0;
       } else {
          comm = local;
-         root = local_leader;
+         root = 0;
       }
       MPI_Comm_spawn( command, argv, maxprocs, info, root, comm, &inter, &err[0]);
       if (inter != MPI_COMM_NULL) {
-         ConnectIntercomm(inter, world_);
+         ConnectIntercomm(inter, false, work_);
       } else {
          // could not spawn?
       }
