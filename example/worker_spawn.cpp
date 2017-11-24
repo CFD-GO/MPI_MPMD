@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
    std::vector<int> excl;
    excl.push_back(0); // Exclude process 0 from the working group.
    
-   MPMD.Init(MPI_COMM_WORLD, "WITH_WORKERS", excl);
+   MPMD.Init(MPI_COMM_WORLD, "WORKER_SPAWN", excl);
    
    for (int i=1; i<argc; i++) {
       int n = atoi(argv[i]);

@@ -206,7 +206,7 @@ public:
       if (my_trivial_group && other_trivial_group) {
          ret.work = inter;
       } else {
-         MPI_Comm_create(ret.local, work_group, &ret.work);
+         MPI_Comm_create(inter, work_group, &ret.work);
       }
 
       if (ret.work != MPI_COMM_NULL) {

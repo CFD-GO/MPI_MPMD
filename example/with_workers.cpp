@@ -11,9 +11,14 @@ int main(int argc, char *argv[])
    
    MPMD.Init(MPI_COMM_WORLD, "WITH_WORKERS", excl);
    
-   MPMD.Identify();
+   for (int i=1; i<argc; i++) {
+      int n = atoi(argv[i]);
+      i++;
+      if (i >= argc) return -1;
+      MPMD.Spawn(argv[i], MPI_ARGV_NULL, n, MPI_INFO_NULL);
+   }
    
-   /// Do some stuff
+   MPMD.Identify();
 
    MPI_Finalize();
    return 0;

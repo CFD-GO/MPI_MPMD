@@ -28,10 +28,30 @@ test : all
 	mpirun -np 2 ./with_workers : -np 1 ./master 2 ./slave	
 	mpirun -np 2 ./with_workers : -np 2 ./master 1 ./slave	
 	mpirun -np 2 ./with_workers : -np 2 ./master 2 ./slave	
+	./with_workers
+	./with_workers 1 ./slave
+	mpirun -np 2 ./with_workers 1 ./slave
+	mpirun -np 2 ./with_workers 1 ./worker_spawn
+	mpirun -np 2 ./with_workers 2 ./slave
+	mpirun -np 2 ./with_workers 2 ./worker_spawn
+	mpirun -np 2 ./with_workers 3 ./worker_spawn
+	mpirun -np 3 ./with_workers 1 ./slave
+	mpirun -np 3 ./with_workers 1 ./worker_spawn
+	mpirun -np 3 ./with_workers 2 ./slave
+	mpirun -np 3 ./with_workers 2 ./worker_spawn
+	mpirun -np 3 ./with_workers 3 ./worker_spawn
 	./worker_spawn
 	./worker_spawn 1 ./slave
 	mpirun -np 2 ./worker_spawn 1 ./slave
+	mpirun -np 2 ./worker_spawn 1 ./with_workers
 	mpirun -np 2 ./worker_spawn 2 ./slave
+	mpirun -np 2 ./worker_spawn 2 ./with_workers
+	mpirun -np 2 ./worker_spawn 3 ./with_workers
+	mpirun -np 3 ./worker_spawn 1 ./slave
+	mpirun -np 3 ./worker_spawn 1 ./with_workers
+	mpirun -np 3 ./worker_spawn 2 ./slave
+	mpirun -np 3 ./worker_spawn 2 ./with_workers
+	mpirun -np 3 ./worker_spawn 3 ./with_workers
 	
 
 master.o : master.cpp ../MPMD.hpp
