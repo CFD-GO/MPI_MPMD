@@ -22,7 +22,7 @@ Then, you can communicate within a single program through `MPMD.local` communica
 Additionaly, one can exclude some of the processes from the communication, which would be common in MPI programs with master-workers architecture.
 
 You can use the library to combine programs both by running them simultaniously, and by dynamic spawning of processes:
-![Scheme](https://raw.githubusercontent.com/CFD-GO/MPI_MPMD/images/scheme.svg?sanitize=true)
+<p align="center"><img src="https://raw.githubusercontent.com/CFD-GO/MPI_MPMD/images/scheme.svg?sanitize=true"/></p>
 
 ## Reference
 
