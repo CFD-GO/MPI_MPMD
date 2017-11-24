@@ -1,4 +1,4 @@
-all: master slave with_workers
+all: master slave with_workers worker_spawn
 
 test : all
 	./master

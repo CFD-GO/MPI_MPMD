@@ -10,6 +10,8 @@ struct MPMDIntercomm {
    int local_size;
    int work_size;
    bool in_world;
+   bool in_local;
+   bool in_work;
    std::string name;
 };
 
@@ -176,8 +178,8 @@ public:
       int my_work = work_ && (local != work);
       int other_work;
       MPI_Exchange(&my_work, 1, &other_work, 1, MPI_INT, inter, my_comm);
-      int no_local = (my_work || other_work);
-      
+      ret.in_local = ! (my_work || other_work);
+
       {
          int other_name_size;
          int my_name_size = name.size() + 1;
@@ -190,12 +192,12 @@ public:
          delete[] other_name;
       }
       
-      if (no_local) {
-         ret.local = MPI_COMM_NULL;
-         ret.local_size = 0;
-      } else {         
+      if (ret.in_local) {
          ret.local = inter;
          MPI_Comm_remote_size(ret.local, &ret.local_size);
+      } else {         
+         ret.local = MPI_COMM_NULL;
+         ret.local_size = 0;
       }
       
       int my_trivial_group = (my_comm == work);
@@ -208,8 +210,10 @@ public:
       }
 
       if (ret.work != MPI_COMM_NULL) {
+         ret.in_work = true;
          MPI_Comm_remote_size(ret.work, &ret.work_size);
       } else {
+         ret.in_work = false;
          ret.work_size = 0;
       }
       
@@ -257,11 +261,11 @@ public:
          intercomm_t inter = c->second;
          iden += " ";
          iden += inter.name;
-         if (in_work) {
-            sprintf(iden_c, "(%d/%d)", inter.work_size, inter.local_size); iden += iden_c;
-         } else {
-            sprintf(iden_c, "(NA/%d)", inter.local_size); iden += iden_c;
-         }
+         iden += "(";
+         if (inter.in_work) { sprintf(iden_c, "%d", inter.work_size); iden += iden_c; } else iden += "NA";
+         iden += "/";
+         if (inter.in_local) { sprintf(iden_c, "%d", inter.local_size); iden += iden_c; } else iden += "NA";
+         iden += ")";
       }
       
       printf("%s\n",iden.c_str());
