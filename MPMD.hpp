@@ -173,7 +173,14 @@ public:
       inter.local = local_inter;
       MPI_Comm_remote_size(inter.local, &inter.local_size);
       inter.in_world = world_;
-      MPI_Comm_create(inter.local, work_group, &inter.work);
+      int my_trivial_group = (local == work);
+      int other_trivial_group;
+      MPI_Exchange(&my_trivial_group, 1, &other_trivial_group, 1, MPI_INT, inter.local, local);
+      if (my_trivial_group && other_trivial_group) {
+         inter.work = inter.local;
+      } else {
+         MPI_Comm_create(inter.local, work_group, &inter.work);
+      }
       if (in_work) {
          if (inter.work != MPI_COMM_NULL) {
             MPI_Comm_remote_size(inter.work, &inter.work_size);
