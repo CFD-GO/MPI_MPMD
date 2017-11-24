@@ -33,6 +33,7 @@ test : all
 master.o : master.cpp ../MPMD.hpp
 slave.o : slave.cpp ../MPMD.hpp
 with_workers.o : with_workers.cpp ../MPMD.hpp
+worker_spawn.o : worker_spawn.cpp ../MPMD.hpp
 
 % : %.o
 	mpic++ -o $@ $(CXXFLAGS) $^
