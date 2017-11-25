@@ -104,8 +104,9 @@ public:
    int universe_size;
    bool in_work;
    typedef MPMDIntercomm intercomm_t;
-   typedef std::map< std::string, MPMDIntercomm > intercomm_map;
+   typedef std::map< std::string, intercomm_t > intercomm_map;
    intercomm_map intercomm;
+   intercomm_t parent;
 
    int leader;
    int local_leader;
@@ -224,16 +225,16 @@ public:
          }
       }
       
-      MPI_Comm parent;
-      MPI_Comm_get_parent(&parent);
-      if (parent != MPI_COMM_NULL) {
-         ConnectIntercomm(parent, false);
+      MPI_Comm parent_;
+      MPI_Comm_get_parent(&parent_);
+      if (parent_ != MPI_COMM_NULL) {
+         parent=ConnectIntercomm(parent_, false);
       }
       
    }
 
 
-   inline void ConnectIntercomm(MPI_Comm inter, bool world_=true, bool work_=false) {
+   inline intercomm_t ConnectIntercomm(MPI_Comm inter, bool world_=true, bool work_=false) {
       intercomm_t ret;
       ret.in_world = world_;
       MPI_Comm my_comm = local;
@@ -272,9 +273,10 @@ public:
       }
       ret.connected = true;
       intercomm.insert(make_pair(ret.name, ret));
+      return ret;
    }
 
-   inline void Spawn( char *command, char *argv[], int maxprocs, MPI_Info info, bool work_ = false) {
+   inline intercomm_t Spawn( char *command, char *argv[], int maxprocs, MPI_Info info, bool work_ = false) {
       MPI_Comm comm, inter;
       std::vector<int> err(maxprocs);
       int root;
@@ -287,9 +289,10 @@ public:
       }
       MPI_Comm_spawn( command, argv, maxprocs, info, root, comm, &inter, &err[0]);
       if (inter != MPI_COMM_NULL) {
-         ConnectIntercomm(inter, false, work_);
+         return ConnectIntercomm(inter, false, work_);
       } else {
-         // could not spawn?
+         intercomm_t ret;
+         return ret;
       }
    }
 
