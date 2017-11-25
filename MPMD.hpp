@@ -279,7 +279,6 @@ public:
          root = 0;
       }
       MPI_Comm_spawn( command, argv, maxprocs, info, root, comm, &inter, &err[0]);
-      for (int i=0; i<err.size(); i++) printf("err:%d\n", err[i]);
       if (inter != MPI_COMM_NULL) {
          ConnectIntercomm(inter, false, work_);
       } else {
