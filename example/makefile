@@ -1,5 +1,11 @@
 all: master slave with_workers worker_spawn
 
+test_check : TEST=@./.run.test
+test_check : test
+test_save : TEST=@./.run.test save
+test_save : test
+
+
 test : all
 	$(TEST) ./master
 	$(TEST) ./slave
