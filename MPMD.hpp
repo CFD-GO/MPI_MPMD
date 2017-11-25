@@ -94,6 +94,7 @@ public:
    int world_rank, world_size;
    int local_rank, local_size;
    int work_rank,  work_size;
+   int universe_size;
    bool in_work;
    typedef MPMDIntercomm intercomm_t;
    typedef std::map< std::string, MPMDIntercomm > intercomm_map;
@@ -137,6 +138,14 @@ public:
          int host_len;
          MPI_Get_processor_name( host_name_c, &host_len );
          host_name = host_name_c;
+      }
+
+      {
+         int *universe_sizep, flag;
+         MPI_Attr_get(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &universe_sizep, &flag);  
+         if (!flag) { 
+           universe_size = 0; // LCOV_EXCL_LINE
+         } else universe_size = *universe_sizep;
       }
 
       mylen = name.size() + 1;
@@ -186,6 +195,7 @@ public:
          work = local;
          work_rank = local_rank;
          work_size = local_size;
+         in_work = true;
       }
       
       for (int c=0; c<colors; c++) {
@@ -269,6 +279,7 @@ public:
          root = 0;
       }
       MPI_Comm_spawn( command, argv, maxprocs, info, root, comm, &inter, &err[0]);
+      for (int i=0; i<err.size(); i++) printf("err:%d\n", err[i]);
       if (inter != MPI_COMM_NULL) {
          ConnectIntercomm(inter, false, work_);
       } else {
