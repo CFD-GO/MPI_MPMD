@@ -13,6 +13,13 @@ struct MPMDIntercomm {
    bool in_local;
    bool in_work;
    std::string name;
+   bool connected;
+   inline MPMDIntercomm() {
+      local = work = MPI_COMM_NULL;
+      local_size = work_size = 0;
+      connected = in_world = in_local = in_work = false;
+      name = "";
+   }
 };
 
 inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI_Datatype datatype, MPI_Comm intercomm, MPI_Comm comm) {
@@ -263,7 +270,7 @@ public:
          ret.in_work = false;
          ret.work_size = 0;
       }
-      
+      ret.connected = true;
       intercomm.insert(make_pair(ret.name, ret));
    }
 
