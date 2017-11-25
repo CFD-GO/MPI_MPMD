@@ -1,0 +1,3 @@
+MPMD: MASTER: local:0/2 work:0/2 ---  connected to: SLAVE(1/1)
+MPMD: MASTER: local:1/2 work:1/2 ---  connected to: SLAVE(1/1)
+MPMD: SLAVE: local:0/1 work:0/1 ---  connected to: MASTER(2/2)

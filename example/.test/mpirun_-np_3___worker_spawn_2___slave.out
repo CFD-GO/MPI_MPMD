@@ -1,0 +1,5 @@
+MPMD: SLAVE: local:0/2 work:0/2 ---  connected to: WORKER_SPAWN(2/NA)
+MPMD: SLAVE: local:1/2 work:1/2 ---  connected to: WORKER_SPAWN(2/NA)
+MPMD: WORKER_SPAWN: local:0/3 work:NA/2 ---  connected to:
+MPMD: WORKER_SPAWN: local:1/3 work:0/2 ---  connected to: SLAVE(2/NA)
+MPMD: WORKER_SPAWN: local:2/3 work:1/2 ---  connected to: SLAVE(2/NA)

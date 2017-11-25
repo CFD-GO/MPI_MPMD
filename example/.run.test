@@ -1,0 +1,51 @@
+#!/bin/bash
+
+
+if test "x$1" == "xsave"
+then
+        SAVE=true
+        shift
+else
+        SAVE=false
+fi
+
+FN="$(echo "$@" | sed 's|[ :/.]|_|g').out"
+TFN=".test/$FN"
+
+function ok {
+        MSG=$1
+        shift
+        echo -e "[\e[32m$MSG\e[0m] --- $@"
+        exit 0;
+}
+
+function wrong {
+        MSG=$1
+        shift
+        echo -e "[\e[31m$MSG\e[0m] --- $@"
+        exit -1;
+}
+
+trap "rm $FN" EXIT
+if $@ | sort > $FN
+then
+        if $SAVE
+        then
+                cp "$FN" "$TFN"
+                ok "  SAVE  " "$@"
+        else
+                if test -f "$TFN"
+                then
+                        if diff "$FN" "$TFN" >/dev/null
+                        then
+                                ok "   OK   " "$@"
+                        else
+                                wrong " WRONG  " "$@"
+                        fi
+                else
+                        wrong "NO  TEST" "$@"
+                fi
+        fi
+else
+        wrong "  FAIL  " "$@"
+fi

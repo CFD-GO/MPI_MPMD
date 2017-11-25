@@ -1,0 +1,4 @@
+MPMD: SLAVE: local:0/1 work:0/1 ---  connected to: WITH_WORKERS(2/3)
+MPMD: WITH_WORKERS: local:0/3 work:NA/2 ---  connected to: SLAVE(NA/1)
+MPMD: WITH_WORKERS: local:1/3 work:0/2 ---  connected to: SLAVE(1/1)
+MPMD: WITH_WORKERS: local:2/3 work:1/2 ---  connected to: SLAVE(1/1)
