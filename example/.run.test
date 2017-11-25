@@ -27,8 +27,10 @@ function wrong {
 }
 
 trap "rm $FN" EXIT
-if $@ | sort > $FN
+if $@ > $FN
 then
+	sort $FN > .tmp.out
+	mv .tmp.out $FN
         if $SAVE
         then
                 cp "$FN" "$TFN"
