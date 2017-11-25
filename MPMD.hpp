@@ -15,6 +15,65 @@ struct MPMDIntercomm {
    std::string name;
 };
 
+inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI_Datatype datatype, MPI_Comm intercomm, MPI_Comm comm) {
+   MPI_Request request;
+   MPI_Status status;
+   int rank;
+   MPI_Comm_rank(intercomm, &rank);
+   fflush(stdout);
+   if (rank == 0) {
+      MPI_Isend(out, out_count, datatype, 0, 123, intercomm, &request);
+      MPI_Recv(in, in_count, datatype, 0, 123, intercomm, &status);
+      MPI_Wait(&request,  &status);
+   }
+   MPI_Bcast(in, in_count, datatype, 0, comm);
+}
+
+template <typename T> inline MPI_Datatype MPI_Auto_datatype();
+template <> inline MPI_Datatype MPI_Auto_datatype< int >() { return MPI_INT; }
+template <> inline MPI_Datatype MPI_Auto_datatype< char >() { return MPI_CHAR; }
+template <> inline MPI_Datatype MPI_Auto_datatype< size_t >() { return MPI_LONG; }
+
+template <class T> inline T MPI_Exchange(T& out, MPI_Comm intercomm, MPI_Comm comm) {
+   T ret;
+   MPI_Exchange(&out, 1, &ret, 1, MPI_Auto_datatype<T>(), intercomm, comm);
+   return ret;
+};
+
+template <>
+inline int MPI_Exchange(int& out, MPI_Comm intercomm, MPI_Comm comm) {
+   int ret;
+   MPI_Exchange(&out, 1, &ret, 1, MPI_INT, intercomm, comm);
+   return ret;
+}
+
+template <class T>
+inline T MPI_Exchange_container(T& out, MPI_Comm intercomm, MPI_Comm comm) {
+   int my_size = out.size();
+   int other_size = MPI_Exchange(my_size, intercomm, comm);
+   int mx = my_size;
+   if (other_size > mx) mx = other_size;
+   T ret;
+   for (int i=0; i<mx; i++) {
+      typename T::value_type a,b;
+      if (i < my_size) a = out[i];
+      b = MPI_Exchange(a, intercomm, comm);
+      if (i < other_size) ret.push_back(b);
+   }
+   return ret;
+}
+
+template <class T>
+inline std::vector<T> MPI_Exchange(std::vector<T>& out, MPI_Comm intercomm, MPI_Comm comm) {
+   return MPI_Exchange_container(out, intercomm, comm);
+}
+
+template <>
+inline std::string MPI_Exchange(std::string& out, MPI_Comm intercomm, MPI_Comm comm) {
+   return MPI_Exchange_container(out, intercomm, comm);
+}
+
+
 class MPMDHelper {
    static char * char_vec_from_string( std::string str, int size) {
       char * ret = new char[size];
@@ -156,19 +215,6 @@ public:
       
    }
 
-   inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI_Datatype datatype, MPI_Comm intercomm, MPI_Comm comm) {
-      MPI_Request request;
-      MPI_Status status;
-      int rank;
-      MPI_Comm_rank(intercomm, &rank);
-      fflush(stdout);
-      if (rank == 0) {
-         MPI_Isend(out, out_count, datatype, 0, 123, intercomm, &request);
-         MPI_Recv(in, in_count, datatype, 0, 123, intercomm, &status);
-         MPI_Wait(&request,  &status);
-      }
-      MPI_Bcast(in, in_count, datatype, 0, comm);
-   }
 
    inline void ConnectIntercomm(MPI_Comm inter, bool world_=true, bool work_=false) {
       intercomm_t ret;
@@ -177,20 +223,11 @@ public:
       if (work_) my_comm = work;
       int my_work = work_ && (local != work);
       int other_work;
-      MPI_Exchange(&my_work, 1, &other_work, 1, MPI_INT, inter, my_comm);
+//      MPI_Exchange(&my_work, 1, &other_work, 1, MPI_INT, inter, my_comm);
+      other_work = MPI_Exchange(my_work, inter, my_comm);
       ret.in_local = ! (my_work || other_work);
 
-      {
-         int other_name_size;
-         int my_name_size = name.size() + 1;
-         MPI_Exchange(&my_name_size, 1, &other_name_size, 1, MPI_INT, inter, my_comm);
-         char* my_name = char_vec_from_string(name, my_name_size);
-         char* other_name = char_vec_from_string("", other_name_size);
-         MPI_Exchange(my_name, my_name_size, other_name, other_name_size, MPI_CHAR, inter, my_comm);
-         ret.name = other_name;
-         delete[] my_name;
-         delete[] other_name;
-      }
+      ret.name = MPI_Exchange(name, inter, my_comm);
       
       if (ret.in_local) {
          ret.local = inter;
