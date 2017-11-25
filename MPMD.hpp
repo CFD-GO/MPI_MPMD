@@ -20,6 +20,7 @@ struct MPMDIntercomm {
       connected = in_world = in_local = in_work = false;
       name = "";
    }
+   inline operator bool() const { return connected; }
 };
 
 inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI_Datatype datatype, MPI_Comm intercomm, MPI_Comm comm) {
