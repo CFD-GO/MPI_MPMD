@@ -85,9 +85,9 @@ inline std::string MPI_Exchange(std::string& out, MPI_Comm intercomm, MPI_Comm c
 
 
 class MPMDHelper {
-   static char * char_vec_from_string( std::string str, int size) {
+   static char * char_vec_from_string( std::string str, size_t size) {
       char * ret = new char[size];
-      int i=0;
+      size_t i=0;
       for (; i<str.size(); i++) ret[i] = str[i];
       for (; i<size; i++) ret[i] = '\0';
       return ret;
