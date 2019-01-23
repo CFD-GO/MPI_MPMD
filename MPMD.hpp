@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
+#include <map>
 #include <mpi.h>
 #include <assert.h>
 
