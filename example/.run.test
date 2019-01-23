@@ -9,7 +9,7 @@ else
         SAVE=false
 fi
 
-FN="$(echo "$@" | sed 's|[ :/.]|_|g').out"
+FN="$(echo "$@" | sed 's|--mca mpi_yield_when_idle 1 ||' | sed 's|[ :/.]|_|g').out"
 TFN=".test/$FN"
 
 function ok {
