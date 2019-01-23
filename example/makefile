@@ -5,7 +5,7 @@ test_check : test
 test_save : TEST=@./.run.test save
 test_save : test
 
-MPIRUN=mpirun --mca mpi_yield_when_idle
+MPIRUN=mpirun --mca mpi_yield_when_idle 1
 
 test : all
 	$(TEST) ./master
