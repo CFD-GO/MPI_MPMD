@@ -37,7 +37,6 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    tag = (tag + 1) % 200;
    MPI_Comm_rank(intercomm, &rank);
    DEBUG_M;
-   fflush(stdout);
    if (rank == 0) {
       DEBUG_M;
       MPI_Isend(out, out_count, datatype, 0, tag, intercomm, &request);
