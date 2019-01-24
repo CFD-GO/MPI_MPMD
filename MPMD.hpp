@@ -156,6 +156,7 @@ public:
       int colors = 0;
       
       name = name_;
+      mpmd_debug_name = name_;
       MPI_Comm_rank(world, &world_rank);
       MPI_Comm_size(world, &world_size);
       {
