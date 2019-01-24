@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if test "x$1" == "xsave"
 then
         SAVE=true
@@ -9,45 +8,51 @@ else
         SAVE=false
 fi
 
-FN="$(echo "$@" | sed 's|[ :/.]|_|g').out"
+FN="$(echo "$@" | sed 's|--mca mpi_yield_when_idle 1 ||' | sed 's|[ :/.]|_|g').out"
 TFN=".test/$FN"
 
 function ok {
         MSG=$1
         shift
         echo -e "[\e[32m$MSG\e[0m] --- $@"
-        exit 0;
 }
 
 function wrong {
         MSG=$1
         shift
         echo -e "[\e[31m$MSG\e[0m] --- $@"
-        exit -1;
 }
 
 trap "rm $FN" EXIT
-if $@ > $FN
+if timeout 60 $@ > $FN
 then
-	sort $FN > .tmp.out
+	cat $FN | grep -v "^DEBUG:" | sort > .tmp.out
 	mv .tmp.out $FN
         if $SAVE
         then
                 cp "$FN" "$TFN"
                 ok "  SAVE  " "$@"
+                exit 0
         else
                 if test -f "$TFN"
                 then
                         if diff "$FN" "$TFN" >/dev/null
                         then
                                 ok "   OK   " "$@"
+                                exit 0
                         else
                                 wrong " WRONG  " "$@"
+                                exit 2
                         fi
                 else
                         wrong "NO  TEST" "$@"
+                        exit 3
                 fi
         fi
 else
         wrong "  FAIL  " "$@"
+        echo "---- output ----"
+        cat $FN
+        echo "---- end ----"
+        exit 1
 fi
