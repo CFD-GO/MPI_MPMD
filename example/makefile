@@ -14,10 +14,10 @@ test : all
 	$(TEST) $(MPIRUN) -np 2 ./master
 	$(TEST) $(MPIRUN) -np 2 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./with_workers
-	$(TEST) ./master 1 ./slave
-	$(TEST) ./master 2 ./slave
-	$(TEST) ./master 1 ./with_workers
-	$(TEST) ./master 2 ./with_workers
+	$(TEST) $(MPIRUN) ./master 1 ./slave
+	$(TEST) $(MPIRUN) ./master 2 ./slave
+	$(TEST) $(MPIRUN) ./master 1 ./with_workers
+	$(TEST) $(MPIRUN) ./master 2 ./with_workers
 	$(TEST) $(MPIRUN) -np 2 ./master 1 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./master 2 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./master 1 ./with_workers
@@ -35,8 +35,8 @@ test : all
 	$(TEST) $(MPIRUN) -np 2 ./with_workers : -np 1 ./master 2 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./with_workers : -np 2 ./master 1 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./with_workers : -np 2 ./master 2 ./slave
-	$(TEST) ./with_workers
-	$(TEST) ./with_workers 1 ./slave
+	$(TEST) $(MPIRUN) ./with_workers
+	$(TEST) $(MPIRUN) ./with_workers 1 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./with_workers 1 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./with_workers 1 ./worker_spawn
 	$(TEST) $(MPIRUN) -np 2 ./with_workers 2 ./slave
@@ -47,8 +47,8 @@ test : all
 	$(TEST) $(MPIRUN) -np 3 ./with_workers 2 ./slave
 	$(TEST) $(MPIRUN) -np 3 ./with_workers 2 ./worker_spawn
 	$(TEST) $(MPIRUN) -np 3 ./with_workers 3 ./worker_spawn
-	$(TEST) ./worker_spawn
-	$(TEST) ./worker_spawn 1 ./slave
+	$(TEST) $(MPIRUN) ./worker_spawn
+	$(TEST) $(MPIRUN) ./worker_spawn 1 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./worker_spawn 1 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./worker_spawn 1 ./with_workers
 	$(TEST) $(MPIRUN) -np 2 ./worker_spawn 2 ./slave
