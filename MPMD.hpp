@@ -164,7 +164,9 @@ public:
       }
 
       mylen = name.size() + 1;
+      DEBUG_M;
       MPI_Allreduce( &mylen, &maxlen, 1, MPI_INT, MPI_MAX, world);
+      DEBUG_M;
       MPI_Barrier(world);
       char* my_name = char_vec_from_string(name, maxlen);
       char* other_name = char_vec_from_string("", maxlen);
@@ -175,6 +177,7 @@ public:
       int rank, who;
       rank = world_rank;
       int end_value = world_size;
+      DEBUG_M;
       while (colors <= world_size) {
          MPI_Allreduce( &rank, &who, 1, MPI_INT, MPI_MIN, world);
          if (who == end_value) break;
@@ -194,10 +197,11 @@ public:
       assert(colors <= world_size);
       delete[] my_name;
       delete[] other_name;
+      DEBUG_M;
       MPI_Comm_split(world, color, rank, &local);
       MPI_Comm_rank(local, &local_rank);
       MPI_Comm_size(local, &local_size);
-
+      DEBUG_M;
       MPI_Comm_group(local,&local_group);
       if (excl.size() > 0) {
          MPI_Group_excl(local_group,excl.size(),&excl[0],&work_group);
@@ -213,6 +217,7 @@ public:
          in_work = true;
       }
       
+      DEBUG_M;
       for (int c=0; c<colors; c++) {
          rank = local_rank;
          MPI_Bcast(&rank, 1, MPI_INT, leaders[c], world);
@@ -232,6 +237,7 @@ public:
          }
       }
       
+      DEBUG_M;
       MPI_Comm parent_;
       MPI_Comm_get_parent(&parent_);
       if (parent_ != MPI_COMM_NULL) {
