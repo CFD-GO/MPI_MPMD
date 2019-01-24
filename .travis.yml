@@ -9,6 +9,7 @@ addons:
       - time
 
 script:
+    - mpirun --version
     - export CXXFLAGS="-fprofile-arcs -ftest-coverage -Wno-write-strings  -Wall -Werror -Wno-unused-but-set-variable -Wno-unused-variable"
     - make -C example
     - timeout 600s make -C example test_check
