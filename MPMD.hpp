@@ -30,20 +30,22 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    MPI_Request request;
    MPI_Status status;
    int rank;
+   static int tag = 123;
+   tag = (tag + 1) % 200;
    MPI_Comm_rank(intercomm, &rank);
-   printf("DEBUG: Exchange (%d)\n",rank);
+   printf("DEBUG: Exchange (%d) tag:%d\n",rank,tag);
    fflush(stdout);
    if (rank == 0) {
-      printf("DEBUG: Exchange (%d) I\n",rank);
-      MPI_Isend(out, out_count, datatype, 0, 123, intercomm, &request);
-      printf("DEBUG: Exchange (%d) II\n",rank);
-      MPI_Recv(in, in_count, datatype, 0, 123, intercomm, &status);
-      printf("DEBUG: Exchange (%d) III\n",rank);
+      printf("DEBUG: Exchange (%d) tag:%d I\n",rank,tag);
+      MPI_Isend(out, out_count, datatype, 0, tag, intercomm, &request);
+      printf("DEBUG: Exchange (%d) tag:%d II\n",rank,tag);
+      MPI_Recv(in, in_count, datatype, 0, tag, intercomm, &status);
+      printf("DEBUG: Exchange (%d) tag:%d III\n",rank,tag);
       MPI_Wait(&request,  &status);
    }
-   printf("DEBUG: Exchange (%d) IV\n",rank);
+   printf("DEBUG: Exchange (%d) tag:%d IV\n",rank,tag);
    MPI_Bcast(in, in_count, datatype, 0, comm);
-   printf("DEBUG: Exchange (%d) V\n",rank);
+   printf("DEBUG: Exchange (%d) tag:%d V\n",rank,tag);
 }
 
 template <typename T> inline MPI_Datatype MPI_Auto_datatype();
