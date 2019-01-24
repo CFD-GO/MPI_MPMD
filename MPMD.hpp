@@ -5,6 +5,8 @@
 #include <mpi.h>
 #include <assert.h>
 
+#define DEBUG_M if (debug) printf("DEBUG: MPMD: %s: %s (%d)\n", name.c_str(), __FILE__, __LINE__ )
+
 struct MPMDIntercomm {
    MPI_Comm local;
    MPI_Comm work;
@@ -94,7 +96,7 @@ class MPMDHelper {
       return ret;
    }
 
-
+   bool debug;
 public:
    MPI_Comm world;
    MPI_Comm local;
@@ -118,10 +120,11 @@ public:
    std::string name;
    std::string host_name;
 
-   inline MPMDHelper() {
+   inline MPMDHelper(const bool& debug_ = false) {
       world = MPI_COMM_NULL;
       local = MPI_COMM_NULL;
       local_rank = -1;
+      debug = debug_;
    };
 
    inline ~MPMDHelper() {
@@ -239,6 +242,7 @@ public:
 
 
    inline intercomm_t ConnectIntercomm(MPI_Comm inter, bool world_=true, bool work_=false) {
+      DEBUG_M;
       intercomm_t ret;
       ret.in_world = world_;
       MPI_Comm my_comm = local;
