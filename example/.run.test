@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if test "x$1" == "xsave"
 then
         SAVE=true
@@ -27,7 +26,7 @@ function wrong {
 }
 
 trap "rm $FN" EXIT
-if $@ > $FN
+if timeout 60 $@ > $FN
 then
 	sort $FN > .tmp.out
 	mv .tmp.out $FN

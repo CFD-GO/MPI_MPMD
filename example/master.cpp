@@ -11,7 +11,10 @@ int main(int argc, char *argv[])
       int n = atoi(argv[i]);
       i++;
       if (i >= argc) return -1;
-      MPMD.Spawn(argv[i], MPI_ARGV_NULL, n, MPI_INFO_NULL);
+      if (! MPMD.Spawn(argv[i], MPI_ARGV_NULL, n, MPI_INFO_NULL)) {
+         fprintf(stderr, "Failed to spawn\n");
+         return -1;
+      }
    }
 
    MPMD.Identify();
