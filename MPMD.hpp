@@ -8,7 +8,7 @@
 
 std::string mpmd_debug_name;
 bool mpmd_debug;
-#define DEBUG_M if (mpmd_debug) printf("DEBUG: MPMD: %s: %s (%d)\n", mpmd_debug_name.c_str(), __FILE__, __LINE__ )
+#define DEBUG_M if (mpmd_debug) { fprintf(stdout,"DEBUG: MPMD: %s: %s (%d)\n", mpmd_debug_name.c_str(), __FILE__, __LINE__ ); fflush(stdout); }
 
 struct MPMDIntercomm {
    MPI_Comm local;
