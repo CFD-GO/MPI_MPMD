@@ -10,6 +10,15 @@ std::string mpmd_debug_name;
 bool mpmd_debug;
 #define DEBUG_M if (mpmd_debug) { fprintf(stdout,"DEBUG: MPMD: %s: %s (%d)\n", mpmd_debug_name.c_str(), __FILE__, __LINE__ ); fflush(stdout); }
 
+char* mpi_type_name(MPI_Datatype datatype) {
+   if (datatype == MPI_INT) return "INT";
+   if (datatype == MPI_CHAR) return "CHAR";
+   if (datatype == MPI_UNSIGNED) return "UNSIGNED";
+   if (datatype == MPI_LONG) return "LONG";
+   if (datatype == MPI_UNSIGNED_LONG) return "UNSIGNED_LONG";
+   return "UNKNOWN";
+}
+
 struct MPMDIntercomm {
    MPI_Comm local;
    MPI_Comm work;
@@ -38,6 +47,7 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    MPI_Comm_rank(intercomm, &rank);
    DEBUG_M;
    if (rank == 0) {
+      fprintf(stdout, "DEBUG: MPMD: %s: Exchange %d %d %s %d %ld\n", mpmd_debug_name.c_str(), out_count,in_count, mpi_type_name(datatype), tag, (long int) intercomm);
       DEBUG_M;
       MPI_Isend(out, out_count, datatype, 0, tag, intercomm, &request);
       DEBUG_M;
