@@ -31,7 +31,7 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    MPI_Status status;
    int rank;
    MPI_Comm_rank(intercomm, &rank);
-   printf("Exchange (%d)\n",rank);
+   printf("DEBUG: Exchange (%d)\n",rank);
    fflush(stdout);
    if (rank == 0) {
       MPI_Isend(out, out_count, datatype, 0, 123, intercomm, &request);
