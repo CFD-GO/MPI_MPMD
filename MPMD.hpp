@@ -5,7 +5,10 @@
 #include <mpi.h>
 #include <assert.h>
 
-#define DEBUG_M if (debug) printf("DEBUG: MPMD: %s: %s (%d)\n", name.c_str(), __FILE__, __LINE__ )
+
+std::string mpmd_debug_name;
+bool mpmd_debug;
+#define DEBUG_M if (mpmd_debug) printf("DEBUG: MPMD: %s: %s (%d)\n", mpmd_debug_name.c_str(), __FILE__, __LINE__ )
 
 struct MPMDIntercomm {
    MPI_Comm local;
@@ -33,19 +36,19 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    static int tag = 123;
    tag = (tag + 1) % 200;
    MPI_Comm_rank(intercomm, &rank);
-   printf("DEBUG: Exchange (%d) tag:%d\n",rank,tag);
+   DEBUG_M;
    fflush(stdout);
    if (rank == 0) {
-      printf("DEBUG: Exchange (%d) tag:%d I\n",rank,tag);
+      DEBUG_M;
       MPI_Isend(out, out_count, datatype, 0, tag, intercomm, &request);
-      printf("DEBUG: Exchange (%d) tag:%d II\n",rank,tag);
+      DEBUG_M;
       MPI_Recv(in, in_count, datatype, 0, tag, intercomm, &status);
-      printf("DEBUG: Exchange (%d) tag:%d III\n",rank,tag);
+      DEBUG_M;
       MPI_Wait(&request,  &status);
    }
-   printf("DEBUG: Exchange (%d) tag:%d IV\n",rank,tag);
+   DEBUG_M;
    MPI_Bcast(in, in_count, datatype, 0, comm);
-   printf("DEBUG: Exchange (%d) tag:%d V\n",rank,tag);
+   DEBUG_M;
 }
 
 template <typename T> inline MPI_Datatype MPI_Auto_datatype();
@@ -104,7 +107,6 @@ class MPMDHelper {
       return ret;
    }
 
-   bool debug;
 public:
    MPI_Comm world;
    MPI_Comm local;
@@ -132,7 +134,7 @@ public:
       world = MPI_COMM_NULL;
       local = MPI_COMM_NULL;
       local_rank = -1;
-      debug = debug_;
+      mpmd_debug = debug_;
    };
 
    inline ~MPMDHelper() {
