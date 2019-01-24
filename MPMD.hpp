@@ -256,11 +256,14 @@ public:
       int my_work = work_ && (local != work);
       int other_work;
 //      MPI_Exchange(&my_work, 1, &other_work, 1, MPI_INT, inter, my_comm);
+      DEBUG_M;
       other_work = MPI_Exchange(my_work, inter, my_comm);
       ret.in_local = ! (my_work || other_work);
 
+      DEBUG_M;
       ret.name = MPI_Exchange(name, inter, my_comm);
       
+      DEBUG_M;
       if (ret.in_local) {
          ret.local = inter;
          MPI_Comm_remote_size(ret.local, &ret.local_size);
@@ -271,6 +274,7 @@ public:
       
       int my_trivial_group = (my_comm == work);
       int other_trivial_group;
+      DEBUG_M;
       MPI_Exchange(&my_trivial_group, 1, &other_trivial_group, 1, MPI_INT, inter, my_comm);
       if (my_trivial_group && other_trivial_group) {
          ret.work = inter;
@@ -286,6 +290,7 @@ public:
          ret.work_size = 0;
       }
       ret.connected = true;
+      DEBUG_M;
       intercomm.insert(make_pair(ret.name, ret));
       return ret;
    }
