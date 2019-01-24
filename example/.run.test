@@ -26,7 +26,7 @@ function wrong {
 trap "rm $FN" EXIT
 if timeout 60 $@ > $FN
 then
-	sort $FN > .tmp.out
+	cat $FN | grep -v "^DEBUG:" | sort > .tmp.out
 	mv .tmp.out $FN
         if $SAVE
         then

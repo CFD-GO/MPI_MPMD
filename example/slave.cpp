@@ -2,17 +2,17 @@
 
 int main(int argc, char *argv[])
 {
-   MPMDHelper MPMD;
+   MPMDHelper MPMD(true);
 
-   printf("SLAVE: Initializing MPI...\n");
+   printf("DEBUG: SLAVE: Initializing MPI...\n");
    MPI_Init(&argc, &argv);
-   printf("SLAVE: Initializing MPMD...\n");
+   printf("DEBUG: SLAVE: Initializing MPMD...\n");
    MPMD.Init(MPI_COMM_WORLD, "SLAVE");
 
-   printf("SLAVE: Identify...\n");
+   printf("DEBUG: SLAVE: Identify...\n");
    MPMD.Identify();
 
-   printf("SLAVE: Finalize MPI...\n");
+   printf("DEBUG: SLAVE: Finalize MPI...\n");
    MPI_Finalize();
    return 0;
 }
