@@ -34,11 +34,16 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    printf("DEBUG: Exchange (%d)\n",rank);
    fflush(stdout);
    if (rank == 0) {
+      printf("DEBUG: Exchange (%d) I\n",rank);
       MPI_Isend(out, out_count, datatype, 0, 123, intercomm, &request);
+      printf("DEBUG: Exchange (%d) II\n",rank);
       MPI_Recv(in, in_count, datatype, 0, 123, intercomm, &status);
+      printf("DEBUG: Exchange (%d) III\n",rank);
       MPI_Wait(&request,  &status);
    }
+   printf("DEBUG: Exchange (%d) IV\n",rank);
    MPI_Bcast(in, in_count, datatype, 0, comm);
+   printf("DEBUG: Exchange (%d) V\n",rank);
 }
 
 template <typename T> inline MPI_Datatype MPI_Auto_datatype();
