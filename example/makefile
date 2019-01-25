@@ -14,6 +14,7 @@ test : all
 	$(TEST) $(MPIRUN) -np 2 ./master
 	$(TEST) $(MPIRUN) -np 2 ./slave
 	$(TEST) $(MPIRUN) -np 2 ./with_workers
+	$(TEST) $(MPIRUN) -np 1 ./master : -np 1 ./slave
 	$(TEST) $(MPIRUN) ./master 1 ./slave
 	$(TEST) $(MPIRUN) ./master 2 ./slave
 	$(TEST) $(MPIRUN) ./master 1 ./with_workers
