@@ -5,7 +5,23 @@
 #include <mpi.h>
 #include <assert.h>
 
+<<<<<<< HEAD
 #define DEBUG_M if (debug) printf("DEBUG: MPMD: %s: %s (%d)\n", name.c_str(), __FILE__, __LINE__ )
+=======
+
+std::string mpmd_debug_name;
+bool mpmd_debug;
+#define DEBUG_M if (mpmd_debug) { fprintf(stdout,"DEBUG: MPMD: %s: %s (%d)\n", mpmd_debug_name.c_str(), __FILE__, __LINE__ ); fflush(stdout); }
+
+char* mpi_type_name(MPI_Datatype datatype) {
+   if (datatype == MPI_INT) return "INT";
+   if (datatype == MPI_CHAR) return "CHAR";
+   if (datatype == MPI_UNSIGNED) return "UNSIGNED";
+   if (datatype == MPI_LONG) return "LONG";
+   if (datatype == MPI_UNSIGNED_LONG) return "UNSIGNED_LONG";
+   return "UNKNOWN";
+}
+>>>>>>> c6c57af7c8c469de7b6bc97b501d29ad5bfe8920
 
 struct MPMDIntercomm {
    MPI_Comm local;
@@ -30,14 +46,22 @@ inline void MPI_Exchange(void * out, int out_count, void * in, int in_count, MPI
    MPI_Request request;
    MPI_Status status;
    int rank;
+   static int tag = 123;
+   tag = (tag + 1) % 200;
    MPI_Comm_rank(intercomm, &rank);
-   fflush(stdout);
+   DEBUG_M;
    if (rank == 0) {
-      MPI_Isend(out, out_count, datatype, 0, 123, intercomm, &request);
-      MPI_Recv(in, in_count, datatype, 0, 123, intercomm, &status);
+      fprintf(stdout, "DEBUG: MPMD: %s: Exchange %d %d %s %d %ld\n", mpmd_debug_name.c_str(), out_count,in_count, mpi_type_name(datatype), tag, (long int) intercomm);
+      DEBUG_M;
+      MPI_Isend(out, out_count, datatype, 0, tag, intercomm, &request);
+      DEBUG_M;
+      MPI_Recv(in, in_count, datatype, 0, tag, intercomm, &status);
+      DEBUG_M;
       MPI_Wait(&request,  &status);
    }
+   DEBUG_M;
    MPI_Bcast(in, in_count, datatype, 0, comm);
+   DEBUG_M;
 }
 
 template <typename T> inline MPI_Datatype MPI_Auto_datatype();
@@ -96,7 +120,10 @@ class MPMDHelper {
       return ret;
    }
 
+<<<<<<< HEAD
    bool debug;
+=======
+>>>>>>> c6c57af7c8c469de7b6bc97b501d29ad5bfe8920
 public:
    MPI_Comm world;
    MPI_Comm local;
@@ -124,7 +151,11 @@ public:
       world = MPI_COMM_NULL;
       local = MPI_COMM_NULL;
       local_rank = -1;
+<<<<<<< HEAD
       debug = debug_;
+=======
+      mpmd_debug = debug_;
+>>>>>>> c6c57af7c8c469de7b6bc97b501d29ad5bfe8920
    };
 
    inline ~MPMDHelper() {
@@ -146,6 +177,7 @@ public:
       int colors = 0;
       
       name = name_;
+      mpmd_debug_name = name_;
       MPI_Comm_rank(world, &world_rank);
       MPI_Comm_size(world, &world_size);
       {
@@ -164,7 +196,9 @@ public:
       }
 
       mylen = name.size() + 1;
+      DEBUG_M;
       MPI_Allreduce( &mylen, &maxlen, 1, MPI_INT, MPI_MAX, world);
+      DEBUG_M;
       MPI_Barrier(world);
       char* my_name = char_vec_from_string(name, maxlen);
       char* other_name = char_vec_from_string("", maxlen);
@@ -175,6 +209,7 @@ public:
       int rank, who;
       rank = world_rank;
       int end_value = world_size;
+      DEBUG_M;
       while (colors <= world_size) {
          MPI_Allreduce( &rank, &who, 1, MPI_INT, MPI_MIN, world);
          if (who == end_value) break;
@@ -194,10 +229,11 @@ public:
       assert(colors <= world_size);
       delete[] my_name;
       delete[] other_name;
+      DEBUG_M;
       MPI_Comm_split(world, color, rank, &local);
       MPI_Comm_rank(local, &local_rank);
       MPI_Comm_size(local, &local_size);
-
+      DEBUG_M;
       MPI_Comm_group(local,&local_group);
       if (excl.size() > 0) {
          MPI_Group_excl(local_group,excl.size(),&excl[0],&work_group);
@@ -213,6 +249,7 @@ public:
          in_work = true;
       }
       
+      DEBUG_M;
       for (int c=0; c<colors; c++) {
          rank = local_rank;
          MPI_Bcast(&rank, 1, MPI_INT, leaders[c], world);
@@ -232,6 +269,7 @@ public:
          }
       }
       
+      DEBUG_M;
       MPI_Comm parent_;
       MPI_Comm_get_parent(&parent_);
       if (parent_ != MPI_COMM_NULL) {
@@ -250,11 +288,14 @@ public:
       int my_work = work_ && (local != work);
       int other_work;
 //      MPI_Exchange(&my_work, 1, &other_work, 1, MPI_INT, inter, my_comm);
+      DEBUG_M;
       other_work = MPI_Exchange(my_work, inter, my_comm);
       ret.in_local = ! (my_work || other_work);
 
+      DEBUG_M;
       ret.name = MPI_Exchange(name, inter, my_comm);
       
+      DEBUG_M;
       if (ret.in_local) {
          ret.local = inter;
          MPI_Comm_remote_size(ret.local, &ret.local_size);
@@ -265,6 +306,7 @@ public:
       
       int my_trivial_group = (my_comm == work);
       int other_trivial_group;
+      DEBUG_M;
       MPI_Exchange(&my_trivial_group, 1, &other_trivial_group, 1, MPI_INT, inter, my_comm);
       if (my_trivial_group && other_trivial_group) {
          ret.work = inter;
@@ -280,6 +322,7 @@ public:
          ret.work_size = 0;
       }
       ret.connected = true;
+      DEBUG_M;
       intercomm.insert(make_pair(ret.name, ret));
       return ret;
    }
