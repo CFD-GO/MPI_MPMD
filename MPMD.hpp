@@ -5,10 +5,6 @@
 #include <mpi.h>
 #include <assert.h>
 
-<<<<<<< HEAD
-#define DEBUG_M if (debug) printf("DEBUG: MPMD: %s: %s (%d)\n", name.c_str(), __FILE__, __LINE__ )
-=======
-
 std::string mpmd_debug_name;
 bool mpmd_debug;
 #define DEBUG_M if (mpmd_debug) { fprintf(stdout,"DEBUG: MPMD: %s: %s (%d)\n", mpmd_debug_name.c_str(), __FILE__, __LINE__ ); fflush(stdout); }
@@ -21,7 +17,6 @@ char* mpi_type_name(MPI_Datatype datatype) {
    if (datatype == MPI_UNSIGNED_LONG) return "UNSIGNED_LONG";
    return "UNKNOWN";
 }
->>>>>>> c6c57af7c8c469de7b6bc97b501d29ad5bfe8920
 
 struct MPMDIntercomm {
    MPI_Comm local;
@@ -120,10 +115,6 @@ class MPMDHelper {
       return ret;
    }
 
-<<<<<<< HEAD
-   bool debug;
-=======
->>>>>>> c6c57af7c8c469de7b6bc97b501d29ad5bfe8920
 public:
    MPI_Comm world;
    MPI_Comm local;
@@ -151,11 +142,7 @@ public:
       world = MPI_COMM_NULL;
       local = MPI_COMM_NULL;
       local_rank = -1;
-<<<<<<< HEAD
-      debug = debug_;
-=======
       mpmd_debug = debug_;
->>>>>>> c6c57af7c8c469de7b6bc97b501d29ad5bfe8920
    };
 
    inline ~MPMDHelper() {
